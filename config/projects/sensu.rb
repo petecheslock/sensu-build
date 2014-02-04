@@ -12,7 +12,12 @@ build_iteration ENV['BUILD_NUMBER']
 dependency 'preparation'
 
 # sensu dependencies/components
-# dependency 'somedep'
+dependency 'ruby'
+dependency 'sensu'
+#dependency 'sensu-dashboard'
+#dependency 'sensu_plugin'
+#dependency 'sensu_configs'
+#dependency 'sensu_bin_stubs'
 
 # version manifest file
 dependency 'version-manifest'

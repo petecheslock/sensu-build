@@ -133,7 +133,7 @@ Vagrant.configure('2') do |config|
         sudo su vagrant -c "bundle install --path=/home/vagrant/.bundler"
         export SENSU_VERSION=#{ENV['SENSU_VERSION']}
         export BUILD_NUMBER=#{ENV['BUILD_NUMBER']}
-        bundle exec omnibus build project #{project_name}
+        sudo su vagrant -c "bundle exec omnibus build project #{project_name}"
       OMNIBUS_BUILD
 
     end # config.vm.define.platform
