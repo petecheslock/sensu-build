@@ -1,134 +1,102 @@
-sensu packages, build suite
-===========================
+# sensu Omnibus project
 
-This repo contains the toolset needed to build Sensu packages for all 
-currently supported platforms. The builds are 'omnibus' style packages
-that contain everything they need to run, including their own build of Ruby
-and all required gems. 
+This project creates full-stack platform-specific packages for
+`sensu`!
 
-The build suite relies heavily on Vagrant, Bunchr and FPM. 
+## Installation
 
-VM's are used to build packages native to each OS. E.g: .rpm's on CentOS, and 
-.deb's on Ubuntu. Bunchr allows the same scripts to be used on each platform
-so builds are as consistent as possible and the build scripts easy to maintain.
+We'll assume you have Ruby 1.9+ and Bundler installed. First ensure all
+required gems are installed and ready to use:
 
-The vagrant boxes used for building are generally default/vanilla boxes built
-from Veewee templates and are available at:  http://vagrant.sensuapp.org
-
-Dependencies
-------------
-
-- [Bunchr](https://github.com/joemiller/bunchr)
-- A physical box to run VirtualBox
-- Oracle VirtualBox
-- Vagrant (only tested with Vagrant 1.x)
-- rake (should work on 0.8.7+ and 0.9.x)
-- GNU parallel(1)
-
-Usage
------
-
-There are multiple ways to run the builders:
-
-### Build packages on all supported platforms.
-
-```
-$ export SENSU_VERSION=v0.9.5   # any valid tag in the sensu.git repo. Will also 
-                                # be used as the 'version' in the .rpm/.deb's.
-$ export BUILD_NUMBER=20        # could also use the jenkins build number
-$ ./para-vagrant.sh
+```shell
+$ bundle install --binstubs
 ```
 
-The `para-vagrant.sh` script will boot the VM's sequentially then run the 
-Vagrant provision process (build) in parallel on each VM.
+## Usage
 
-VM's are booted sequentially to avoid any VirtualBox kernel panics.
+### Build
 
-The concurrency can be controlled by setting `$MAX_PROCS` at the top of the
-`para-vagrant.sh` script.
+You create a platform-specific package using the `build project` command:
 
-Detailed Logs of each provision process will be generated in the `logs/` 
-directory.
-
-### Build packages on a single platform, from outside the VM.
-
-Make sure `SENSU_VERSION` and `BUILD_NUMBER` are exported in the environment.
-
-```
-$ vagrant up <BOX_NAME>
- ## or, if the box is already running:
-$ vagrant provision <BOX_NAME>
+```shell
+$ bin/omnibus build project sensu
 ```
 
-You can always boot a box without running a build by executing:
+The platform/architecture type of the package created will match the platform
+where the `build project` command is invoked. So running this command on say a
+MacBook Pro will generate a Mac OS X specific package. After the build
+completes packages will be available in `pkg/`.
 
-```
-$ vagrant up <BOX_NAME> --no-provision
-```
+### Clean
 
-### Build packages from within a VM (or build without Vagrant)
+You can clean up all temporary files generated during the build process with
+the `clean` command:
 
-The builds can also be run without Vagrant, directly on a system (vm or
-physical).
-
-Make sure `SENSU_VERSION` and `BUILD_NUMBER` are exported in the environment.
-
-```
-$ ./build.sh
+```shell
+$ bin/omnibus clean
 ```
 
-The build script will try to install some platform specific packages that 
-are typically not installed on minimal systems such as our Vagrant images.
+Adding the `--purge` purge option removes __ALL__ files generated during the
+build including the project install directory (`/opt/sensu`) and
+the package cache directory (`/var/cache/omnibus/pkg`):
 
-Rake can also be called directly if you're sure the system has all of the
-necessary OS packages installed:
-
-```
-$ rake
+```shell
+$ bin/omnibus clean --purge
 ```
 
-It's good to do a `rake clean` before building, but it's not necessary. Bunchr
-will try to be smart and not re-run parts of the build process that have already
-succeeded. Nonetheless, a clean should probably be done before an official
-build.
+### Help
 
-Known Issues
--------------
+Full help for the Omnibus command line interface can be accessed with the
+`help` command:
 
-* It's not uncommon to see VirtualBox kernel panic on Mac OSX:
-  https://github.com/mitchellh/vagrant/issues/797
+```shell
+$ bin/omnibus help
+```
 
-Future / TODO
--------------
+## Vagrant-based Virtualized Build Lab
 
-See `TODO.md`
+Every Omnibus project ships will a project-specific
+[Berksfile](http://berkshelf.com/) and [Vagrantfile](http://www.vagrantup.com/)
+that will allow you to build your projects on the following platforms:
 
-Acknowledgements
-----------------
+* CentOS 5 64-bit
+* CentOS 6 64-bit
+* Ubuntu 10.04 64-bit
+* Ubuntu 11.04 64-bit
+* Ubuntu 12.04 64-bit
 
-Big thanks to Adam Jacob for the suggestions on how to package Sensu and for
-showing us the way with Omnibus!
+Please note this build-lab is only meant to get you up and running quickly;
+there's nothing inherent in Omnibus that restricts you to just building CentOS
+or Ubuntu packages. See the Vagrantfile to add new platforms to your build lab.
 
-Author
-------
+The only requirements for standing up this virtualized build lab are:
 
-* [Joe Miller](https://twitter.com/miller_joe) - http://joemiller.me / https://github.com/joemiller
+* VirtualBox - native packages exist for most platforms and can be downloaded
+from the [VirtualBox downloads page](https://www.virtualbox.org/wiki/Downloads).
+* Vagrant 1.2.1+ - native packages exist for most platforms and can be downloaded
+from the [Vagrant downloads page](http://downloads.vagrantup.com/).
 
-License
--------
+The [vagrant-berkshelf](https://github.com/RiotGames/vagrant-berkshelf) and
+[vagrant-omnibus](https://github.com/schisamo/vagrant-omnibus) Vagrant plugins
+are also required and can be installed easily with the following commands:
 
-    Author:: Joe Miller (<joeym@joeym.net>)
-    Copyright:: Copyright (c) 2012 Joe Miller
-    License:: Apache License, Version 2.0
+```shell
+$ vagrant plugin install vagrant-berkshelf
+$ vagrant plugin install vagrant-omnibus
+```
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+Once the pre-requisites are installed you can build your package across all
+platforms with the following command:
 
-        http://www.apache.org/licenses/LICENSE-2.0
+```shell
+$ vagrant up
+```
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+If you would like to build a package for a single platform the command looks like this:
+
+```shell
+$ vagrant up PLATFORM
+```
+
+The complete list of valid platform names can be viewed with the
+`vagrant status` command.
