@@ -1,21 +1,21 @@
 
-name "sensu"
-maintainer "CHANGE ME"
-homepage "CHANGEME.com"
+name 'sensu'
+maintainer 'sensuapp.org'
+homepage 'sensuapp.org'
 
-replaces        "sensu"
-install_path    "/opt/sensu"
-build_version   Omnibus::BuildVersion.new.semver
-build_iteration 1
+replaces        'sensu'
+install_path    '/opt/sensu'
+build_version   ENV['SENSU_VERSION']
+build_iteration ENV['BUILD_NUMBER']
 
 # creates required build directories
-dependency "preparation"
+dependency 'preparation'
 
 # sensu dependencies/components
-# dependency "somedep"
+# dependency 'somedep'
 
 # version manifest file
-dependency "version-manifest"
+dependency 'version-manifest'
 
-exclude "\.git*"
-exclude "bundler\/git"
+exclude '\.git*'
+exclude 'bundler\/git'

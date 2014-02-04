@@ -1,9 +1,0 @@
-#!/bin/bash
-#
-# Perform necessary sensu removal steps
-# after package is uninstalled.
-#
-
-echo "sensu has been uninstalled!"
-
-exit 0
