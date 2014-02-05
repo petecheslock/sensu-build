@@ -29,7 +29,7 @@ build_boxes = {
   # 'debian_6_64'    => 'http://vagrant.sensuapp.org/debian-6-amd64.box',
   # 'fedora_17_32'   => 'http://vagrant.sensuapp.org/fedora-17-i386.box',
   # 'fedora_17_64'   => 'http://vagrant.sensuapp.org/fedora-17-x86_64.box',
-    'freebsd_91_64'  => 'http://dyn-vm.s3.amazonaws.com/vagrant/freebsd-9.1_provisionerless.box'
+  #  'freebsd_91_64'  => 'http://dyn-vm.s3.amazonaws.com/vagrant/freebsd-9.1_provisionerless.box'
   # 'debian_5_32'    => '',
   # 'debian_5_64'    => '',
   # 'opensuse_1201_64' => '',
@@ -131,9 +131,7 @@ Vagrant.configure('2') do |config|
         export PATH=/usr/local/bin:$PATH
         cd #{guest_project_path}
         sudo su vagrant -c "bundle install --path=/home/vagrant/.bundler"
-        export SENSU_VERSION=#{ENV['SENSU_VERSION']}
-        export BUILD_NUMBER=#{ENV['BUILD_NUMBER']}
-        sudo su vagrant -c "bundle exec omnibus build project #{project_name}"
+        sudo su vagrant -c "SENSU_VERSION=#{ENV['SENSU_VERSION']} BUILD_NUMBER=#{ENV['BUILD_NUMBER']} bundle exec omnibus build project #{project_name}"
       OMNIBUS_BUILD
 
     end # config.vm.define.platform
