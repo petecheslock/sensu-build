@@ -1,13 +1,8 @@
 name "sensu"
 
 dependency "ruby"
-dependency "bundler"
 
-version "v#{ENV["SENSU_VERSION"]}"
-
-source :git => "git://github.com/sensu/sensu"
-
-gem_bin = "#{install_dir}/embedded/bin/gem"
+version ENV["SENSU_VERSION"]
 
 env = {
         "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
@@ -16,5 +11,5 @@ env = {
       }
 
 build do
-  bundle "install --without development", :env => env
+  gem "install sensu -v #{version} --no-ri --no-rdoc", :env => env
 end

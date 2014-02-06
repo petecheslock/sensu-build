@@ -13,10 +13,12 @@ dependency 'preparation'
 
 # sensu dependencies/components
 dependency 'ruby'
+dependency 'runit'
 dependency 'sensu'
-#dependency 'sensu-dashboard'
-#dependency 'sensu_plugin'
-#dependency 'sensu_configs'
+dependency 'sensu-dashboard'
+dependency 'sensu-plugin'
+#dependency 'sensu-configs'
+#dependency 'sensu-binstubs'
 
 # version manifest file
 dependency 'version-manifest'
