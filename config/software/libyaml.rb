@@ -16,10 +16,10 @@
 #
 
 name "libyaml"
-version "0.1.4"
+version "0.1.5"
 
 source :url => "http://pyyaml.org/download/libyaml/yaml-#{version}.tar.gz",
-       :md5 => "36c852831d02cf90508c29852361d01b"
+       :md5 => "24f6093c1e840ca5df2eb09291a1dbf1"
 
 relative_path "yaml-#{version}"
 
