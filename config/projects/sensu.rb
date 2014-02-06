@@ -17,7 +17,6 @@ dependency 'sensu'
 #dependency 'sensu-dashboard'
 #dependency 'sensu_plugin'
 #dependency 'sensu_configs'
-#dependency 'sensu_bin_stubs'
 
 # version manifest file
 dependency 'version-manifest'
