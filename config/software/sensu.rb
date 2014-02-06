@@ -2,7 +2,11 @@ name "sensu"
 
 dependency "ruby"
 
-version ENV["SENSU_VERSION"]
+version "v#{ENV["SENSU_VERSION"]}"
+
+source :git => "git://github.com/sensu/sensu"
+
+gem_bin = "#{install_dir}/embedded/bin/gem"
 
 env = {
         "CFLAGS" => "-L#{install_dir}/embedded/lib -I#{install_dir}/embedded/include",
@@ -11,5 +15,7 @@ env = {
       }
 
 build do
-  gem "install sensu -v #{version} --no-ri --no-rdoc", :env => env
+  command "rm -f sensu-*.gem"
+  command "#{gem_bin} build sensu.gemspec", :env => env
+  command "#{gem_bin} install --no-ri --no-rdoc sensu-*.gem", :env => env
 end

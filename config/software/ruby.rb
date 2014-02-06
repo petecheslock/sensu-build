@@ -24,28 +24,25 @@ dependency "ncurses"
 dependency "libedit"
 dependency "openssl"
 dependency "libyaml"
-dependency "libiconv"
+dependency "readline"
 dependency "gdbm" if platform == "freebsd"
-dependency "libgcc" if (platform == "solaris2" and Omnibus.config.solaris_compiler == "gcc")
 
 source :url => "http://ftp.ruby-lang.org/pub/ruby/2.0/ruby-#{version}.tar.gz",
        :md5 => "78282433fb697dd3613613ff55d734c1"
 
 relative_path "ruby-#{version}"
+install_prefix = "#{install_dir}/embedded"
 
-env =
-    {
-      "CFLAGS" => "-L#{install_dir}/lib -I#{install_dir}/embedded/include -O3 -g -pipe",
-      "LDFLAGS" => "-Wl,-rpath #{install_dir}/lib -L#{install_dir}/lib -I#{install_dir}/include"
-    }
+env = {
+        "CFLAGS" => "-L#{install_prefix}/lib -I#{install_prefix}/include",
+        "LDFLAGS" => "-Wl,-rpath #{install_prefix}/lib -L#{install_prefix}/lib -I#{install_prefix}/include"
+      }
 
 build do
   configure_command = ["./configure",
-                       "--prefix=#{install_dir}/embedded",
-                       "--with-opt-dir=#{install_dir}/embedded",
+                       "--prefix=#{install_prefix}",
+                       "--with-opt-dir=#{install_prefix}",
                        "--enable-shared",
-                       "--enable-libedit",
-                       "--with-ext=psych",
                        "--disable-install-doc"]
 
   configure_command << "--without-execinfo" if platform == "freebsd"
