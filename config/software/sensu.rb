@@ -1,6 +1,7 @@
 name "sensu"
 
 dependency "ruby"
+dependency "bundler"
 
 version "v#{ENV["SENSU_VERSION"]}"
 
@@ -15,7 +16,5 @@ env = {
       }
 
 build do
-  command "rm -f sensu-*.gem"
-  command "#{gem_bin} build sensu.gemspec", :env => env
-  command "#{gem_bin} install --no-ri --no-rdoc sensu-*.gem", :env => env
+  bundle "install --without development", :env => env
 end
