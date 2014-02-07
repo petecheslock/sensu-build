@@ -50,7 +50,7 @@ build do
    "sv",
    "svlogd",
    "utmpset"].each do |bin|
-    command "cp #{bin} #{install_dir}/embedded/bin", :cwd => working_dir
+    command "cp #{bin} #{install_dir}/embedded/bin", :cwd => "#{working_dir}/src"
   end
 
   #move scripts
