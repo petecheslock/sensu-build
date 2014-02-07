@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+require 'erb'
 
 name "runit"
 version "2.1.1"
@@ -24,6 +25,12 @@ source :url => "http://smarden.org/runit/runit-#{version}.tar.gz",
 relative_path "admin"
 
 working_dir = "#{project_dir}/runit-#{version}"
+
+service_path = File.join(install_dir, 'service')
+sv_path = File.join(install_dir, 'sv')
+install_prefix = File.join(install_dir, "embedded")
+gem_bin = File.join(install_dir, 'bin', 'gem')
+scripts_dir = File.join(Omnibus.project_root, 'runit_scripts')
 
 build do
   # put runit where we want it, not where they tell us to
@@ -37,78 +44,47 @@ build do
 
   # move it
   command "mkdir -p #{install_dir}/embedded/bin"
-  ["src/chpst",
-   "src/runit",
-   "src/runit-init",
-   "src/runsv",
-   "src/runsvchdir",
-   "src/runsvdir",
-   "src/sv",
-   "src/svlogd",
-   "src/utmpset"].each do |bin|
+  ["chpst",
+   "runsv",
+   "runsvdir",
+   "sv",
+   "svlogd",
+   "utmpset"].each do |bin|
     command "cp #{bin} #{install_dir}/embedded/bin", :cwd => working_dir
   end
 
-  block do
-    install_path = self.project.install_path
-    open("#{install_dir}/embedded/bin/runsvdir-start", "w") do |file|
-      file.print <<-EOH
-#!/bin/bash
-#
-# Copyright:: Copyright (c) 2012 Opscode, Inc.
-# License:: Apache License, Version 2.0
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+  #move scripts
+  command "cp -f #{scripts_dir}/sensu-runsvdir.sh #{install_prefix}/bin/sensu-runsvdir"
+  command "chmod 755 #{install_prefix}/bin/sensu-runsvdir"
 
-PATH=#{install_path}/bin:#{install_path}/embedded/bin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin
+  # need ohai and systemu for sensu-ctl
+  gem "install ohai -v 6.16.0 --no-ri --no-rdoc"
+  gem "install systemu -v 2.5.2 --no-ri --no-rdoc"
 
-# enforce our own ulimits
-
-ulimit -c 0
-ulimit -d unlimited
-ulimit -e 0
-ulimit -f unlimited
-ulimit -i 62793
-ulimit -l 64
-ulimit -m unlimited
-# WARNING: increasing the global file descriptor limit increases RAM consumption on startup dramatically
-ulimit -n 50000
-ulimit -q 819200
-ulimit -r 0
-ulimit -s 10240
-ulimit -t unlimited
-ulimit -u unlimited
-ulimit -v unlimited
-ulimit -x unlimited
-echo "1000000" > /proc/sys/fs/file-max
-
-# and our ulimit
-
-umask 022
-
-exec env - PATH=$PATH \
-runsvdir -P #{install_path}/service 'log: ...........................................................................................................................................................................................................................................................................................................................................................................................................'
-       EOH
-    end
-  end
-
-  command "chmod 755 #{install_dir}/embedded/bin/runsvdir-start"
+  command "cp -f #{scripts_dir}/sensu-ctl.rb #{install_prefix}/bin/sensu-ctl"
+  command "chmod 0755 #{install_prefix}/bin/sensu-ctl"
 
   # set up service directories
   ["#{install_dir}/service",
-   "#{install_dir}/sv",
-   "#{install_dir}/init"].each do |dir|
+   "#{install_dir}/sv"].each do |dir|
     command "mkdir -p #{dir}"
+  end
+
+  unless platform == 'windows'
+    block do
+      ["client","server","api","dashboard"].each do |sv|
+        FileUtils.mkdir_p("#{sv_path}/sensu-#{sv}/supervise")
+        File.open("#{scripts_dir}/sensu-sv-run.sh.erb") do |template|
+          @sv = sv
+          erb = ERB.new(template.read)
+          File.open("#{sv_path}/sensu-#{sv}/run", 'w') do |file|
+            file.write(erb.result(binding))
+          end
+        end
+      command "mkdir -p #{sv_path}/sensu-#{sv}/log/main"
+      command "cp -f #{scripts_dir}/sensu-sv-log.sh #{sv_path}/sensu-#{sv}/log/run"
+      command "chmod 0755 #{sv_path}/sensu-#{sv}/run #{sv_path}/sensu-#{sv}/log/run"
+      end
+    end
   end
 end
