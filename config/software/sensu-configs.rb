@@ -13,4 +13,12 @@ build do
   command "cp -rf #{sensu_config}/logrotate.d/* /etc/logrotate.d/"
   command "cp -rf #{sensu_config}/init.d/* /etc/init.d/"
   command "mkdir /usr/share/sensu"
+  command "cp -rf ./sensu_configs/init.d /usr/share/sensu/"
+  command "cp -rf ./sensu_configs/upstart /usr/share/sensu/"
+  command "cp -rf ./sensu_configs/systemd /usr/share/sensu/"
+  command "mkdir /var/log/sensu"
+
+  %w[plugins mutators handlers extensions].each do |dir|
+    command "mkdir /etc/sensu/#{dir}"
+  end
 end
