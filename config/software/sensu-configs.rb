@@ -8,6 +8,7 @@ build do
   command "rm -rf /etc/init.d/sensu-*"
   command "rm -rf /usr/share/sensu"
   command "rm -rf /var/log/sensu"
+  command "mkdir /etc/sensu"
   command "cp -rf #{sensu_config}/sensu /etc/sensu"
   command "cp -rf #{sensu_config}/default/* /etc/default/"
   command "cp -rf #{sensu_config}/logrotate.d/* /etc/logrotate.d/"
