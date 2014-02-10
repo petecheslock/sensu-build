@@ -39,7 +39,7 @@ build_boxes = {
 host_project_path = File.expand_path("..", __FILE__)
 guest_project_path = "/home/vagrant/#{File.basename(host_project_path)}"
 project_name = 'sensu'
-bootstrap_chef_version = '11.8.0'
+bootstrap_chef_version = '11.10.0'
 
 Vagrant.configure('2') do |config|
 
@@ -116,6 +116,7 @@ Vagrant.configure('2') do |config|
           'omnibus' => {
             'build_user' => 'vagrant',
             'build_dir' => guest_project_path,
+            'ruby_version' => '2.0.0-p353',
             'install_dir' => "/opt/#{project_name}"
           }
         }
