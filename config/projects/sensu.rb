@@ -23,15 +23,22 @@ dependency "sensu-configs"
 # version manifest file
 dependency "version-manifest"
 
-#Array of Config-files
-config_files = ["/etc/sensu/config.json.example",
-                "/etc/sensu/conf.d/README.md",
-                "/etc/logrotate.d/sensu",
-                "/etc/init.d/sensu-service",
-                "/etc/init.d/sensu-api",
-                "/etc/init.d/sensu-client",
-                "/etc/init.d/sensu-server",
-                "/etc/init.d/sensu-dashboard"]
+file "/usr/share/sensu"
+file "/var/log/sensu"
+file "/etc/sensu/plugins"
+file "/etc/sensu/mutators"
+file "/etc/sensu/handlers"
+file "/etc/sensu/extensions"
+file "/etc/default/sensu"
+file "/etc/init.d/sensu-service"
+file "/etc/init.d/sensu-api"
+file "/etc/init.d/sensu-client"
+file "/etc/init.d/sensu-server"
+file "/etc/init.d/sensu-dashboard"
+
+config_file "/etc/sensu/config.json.example"
+config_file "/etc/sensu/conf.d/README.md"
+config_file "/etc/logrotate.d/sensu"
 
 exclude "\.git*"
 exclude "bundler\/git"

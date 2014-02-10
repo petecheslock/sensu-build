@@ -4,7 +4,7 @@ sensu_configs = "#{Omnibus.project_root}/sensu_configs"
 
 build do
   command "sudo mkdir /etc/sensu"
-  command "sudo cp -rf #{sensu_configs}/sensu /etc/sensu"
+  command "sudo cp -rf #{sensu_configs}/sensu/* /etc/sensu"
   command "sudo cp -rf #{sensu_configs}/default/* /etc/default/"
   command "sudo cp -rf #{sensu_configs}/logrotate.d/* /etc/logrotate.d/"
   command "sudo cp -rf #{sensu_configs}/init.d/* /etc/init.d/"
